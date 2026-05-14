@@ -22,7 +22,7 @@ class Student(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     student_id = models.CharField(max_length=20, unique=True)
-    gender = models.CharField(max_length=10, choices=[('M', 'Male'), ('F', 'Female')])
+    gender = models.CharField(max_length=15, choices=[('Masculino', 'Masculino'), ('Feminino', 'Feminino')])
     date_of_birth = models.DateField()
     student_class = models.CharField(max_length=100)
     religion = models.CharField(max_length=50)
