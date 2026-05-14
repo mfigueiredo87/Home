@@ -8,8 +8,8 @@
                 <div class="col">
                     <h3 class="page-title">Edit Students</h3>
                     <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/students">Students</a></li>
-                        <li class="breadcrumb-item active">Edit Students</li>
+                        <li class="breadcrumb-item"><a href="/student">Todos Estudantes</a></li>
+                        <li class="breadcrumb-item active">Editar Estudantes</li>
                     </ul>
                 </div>
             </div>
@@ -46,9 +46,9 @@
                                     <div class="form-group">
                                         <label>Gender</label>
                                         <select name="gender" class="form-control">
-                                            <option value="Female" {% if student.gender == 'Female' %}selected{% endif %}>Female</option>
-                                            <option value="Male" {% if student.gender == 'Male' %}selected{% endif %}>Male</option>
-                                            <option value="Others" {% if student.gender == 'Others' %}selected{% endif %}>Others</option>
+                                            <option value="Feminino" {% if student.gender == 'Feminino' %}selected{% endif %}>Feminino</option>
+                                            <option value="Masculino" {% if student.gender == 'Masculino' %}selected{% endif %}>Masculino</option>
+                                           
                                         </select>
                                     </div>
                                 </div>

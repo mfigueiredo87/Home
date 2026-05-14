@@ -1,6 +1,8 @@
 from django.contrib import messages
 from django.db.models import Q
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
+from django.http import HttpResponseForbidden
+from rest_framework.fields import SlugField
 
 from .models import Parent, Student
 
@@ -149,38 +151,241 @@ def student_list(request):
     )
 
 
-def edit_student(request, student_id):
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect, render
+
+from .models import Student
+
+
+def edit_student(request, slug):
+
+    # =========================
+    # Buscar estudante
+    # =========================
+
+    student = get_object_or_404(
+        Student,
+        slug=slug
+    )
+
+    parent = student.parent
+
+    # =========================
+    # Actualizar estudante
+    # =========================
+
+    if request.method == "POST":
+
+        try:
+
+            # =========================
+            # Dados do estudante
+            # =========================
+
+            student.first_name = request.POST.get(
+                "first_name"
+            )
+
+            student.last_name = request.POST.get(
+                "last_name"
+            )
+
+            student.student_id = request.POST.get(
+                "student_id"
+            )
+
+            student.gender = request.POST.get(
+                "gender"
+            )
+
+            student.date_of_birth = request.POST.get(
+                "date_of_birth"
+            )
+
+            student.student_class = request.POST.get(
+                "student_class"
+            )
+
+            student.religion = request.POST.get(
+                "religion"
+            )
+
+            student.joining_date = request.POST.get(
+                "joining_date"
+            )
+
+            student.mobile_number = request.POST.get(
+                "mobile_number"
+            )
+
+            student.admission_number = request.POST.get(
+                "admission_number"
+            )
+
+            student.section = request.POST.get(
+                "section"
+            )
+
+            # =========================
+            # Actualizar imagem
+            # =========================
+
+            if request.FILES.get("student_image"):
+
+                student.student_image = request.FILES.get(
+                    "student_image"
+                )
+
+            # =========================
+            # Dados dos pais
+            # =========================
+
+            parent.father_name = request.POST.get(
+                "father_name"
+            )
+
+            parent.father_occupation = request.POST.get(
+                "father_occupation"
+            )
+
+            parent.father_mobile = request.POST.get(
+                "father_mobile"
+            )
+
+            parent.father_email = request.POST.get(
+                "father_email"
+            )
+
+            parent.mother_name = request.POST.get(
+                "mother_name"
+            )
+
+            parent.mother_occupation = request.POST.get(
+                "mother_occupation"
+            )
+
+            parent.mother_mobile = request.POST.get(
+                "mother_mobile"
+            )
+
+            parent.mother_email = request.POST.get(
+                "mother_email"
+            )
+
+            parent.present_address = request.POST.get(
+                "present_address"
+            )
+
+            parent.permanent_address = request.POST.get(
+                "permanent_address"
+            )
+
+            # =========================
+            # Salvar alterações
+            # =========================
+
+            parent.save()
+            student.save()
+
+            messages.success(
+                request,
+                "Estudante actualizado com sucesso!"
+            )
+
+            return redirect("student_list")
+
+        except Exception as e:
+
+            messages.error(
+                request,
+                f"Erro ao actualizar estudante: {e}"
+            )
+
+            return redirect(
+                "edit_student",
+                slug=student.slug
+            )
 
     context = {
-        "student_id": student_id
+        "student": student,
+        "parent": parent
     }
 
     return render(
         request,
         "students/edit-student.html",
         context
-    )
+    )           
 
-
-def view_student(request, student_id):
-
-    student = Student.objects.get(id=student_id)
-
+def view_student(request, slug):
+    student = get_object_or_404(Student, student_id = slug)
     context = {
-        "student": student
+        'student': student
     }
+    return render(request, "students/student-details.html", context)
 
-    return render(
-        request,
-        "students/student-detail.html",
-        context
-    )
+from django.contrib import messages
+from django.http import HttpResponseForbidden
+from django.shortcuts import get_object_or_404, redirect
 
-def delete_student(request,slug):
-    if request.method == "POST":
-        student = get_object_or_404(Student, slug=slug)
-        student_name = f"{student.first_name} {student.last_name}"
+from .models import Student
+
+
+def delete_student(request, slug):
+
+    # =========================
+    # Permitir apenas POST
+    # =========================
+
+    if request.method != "POST":
+
+        return HttpResponseForbidden(
+            "Método não permitido."
+        )
+
+    try:
+
+        # =========================
+        # Buscar estudante
+        # =========================
+
+        student = get_object_or_404(
+            Student,
+            slug=slug
+        )
+
+        student_name = (
+            f"{student.first_name} "
+            f"{student.last_name}"
+        )
+
+        # =========================
+        # Apagar estudante
+        # =========================
+
         student.delete()
-        create_notification(request.user, f"Deleted student: {student_name}")
-        return redirect ('student_list')
-    return HttpResponseForbidden()
+
+        # =========================
+        # Notificação
+        # =========================
+
+        # create_notification(
+        #     request.user,
+        #     f"Deleted student: {student_name}"
+        # )
+
+        messages.success(
+            request,
+            f"Estudante {student_name} removido com sucesso!"
+        )
+
+        return redirect("student_list")
+
+    except Exception as e:
+
+        messages.error(
+            request,
+            f"Erro ao remover estudante: {e}"
+        )
+
+        return redirect("student_list")
